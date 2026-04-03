@@ -132,7 +132,7 @@ async function callV1Internal(method, accessToken, body, options = {}) {
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${accessToken}`,
-      "User-Agent": "antigravity/ windows/arm64",
+      "User-Agent": "antigravity/1.21.9 windows/arm64",
       "Accept-Encoding": "gzip",
       ...extraHeaders,
     },
@@ -257,7 +257,7 @@ async function fetchAvailableModels(accessToken, limiter, projectId) {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${accessToken}`,
-          "User-Agent": "antigravity/ windows/arm64",
+          "User-Agent": "antigravity/1.21.9 windows/arm64",
         },
         body: JSON.stringify(payload),
       });

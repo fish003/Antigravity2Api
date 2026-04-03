@@ -18,7 +18,7 @@ function inferFinalModelForQuota(claudeReq) {
 
 function shouldForceStreamForNonStreamingModel(modelName) {
   const name = String(modelName || "").toLowerCase();
-  return name.includes("claude") || name.includes("gemini-3-pro");
+  return name.includes("claude") || name.includes("gemini-3.1-pro") || name.includes("gemini-3-pro");
 }
 
 function headersToObject(headers) {

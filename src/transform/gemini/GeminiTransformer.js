@@ -187,6 +187,12 @@ function wrapRequest(clientJson, options) {
     else if (lvl === "low") mappedModelName = "gemini-3-pro-low";
   }
 
+  if (mappedModelName === "gemini-3.1-pro" && typeof levelForMapping === "string") {
+    const lvl = levelForMapping.toLowerCase();
+    if (lvl === "high") mappedModelName = "gemini-3.1-pro-high";
+    else if (lvl === "low") mappedModelName = "gemini-3.1-pro-low";
+  }
+
   const modelNameLower = String(mappedModelName || "").toLowerCase();
   const isClaudeModel = modelNameLower.includes("claude");
 
@@ -250,7 +256,7 @@ function wrapRequest(clientJson, options) {
 
   // Derive requestType: image_gen for image model, web_search if googleSearch tool present, otherwise agent
   let requestType = "agent";
-  if (mappedModelName === "gemini-3-pro-image") {
+  if (mappedModelName === "gemini-3.1-flash-image") {
     requestType = "image_gen";
   } else if (hasGoogleSearchTool) {
     requestType = "web_search";
@@ -258,11 +264,11 @@ function wrapRequest(clientJson, options) {
     mappedModelName = "gemini-2.5-flash";
   }
 
-  // Some upstream models (e.g. claude-*, gemini-3-pro*) require an Antigravity-style systemInstruction,
+  // Some upstream models (e.g. claude-*, gemini-3.1-pro*, gemini-3-pro*) require an Antigravity-style systemInstruction,
   // otherwise they may respond with 429 RESOURCE_EXHAUSTED even when quota exists.
   const modelNameForSystem = String(mappedModelName || "").toLowerCase();
   if (
-    (modelNameForSystem.includes("claude") || modelNameForSystem.includes("gemini-3-pro")) &&
+    (modelNameForSystem.includes("claude") || modelNameForSystem.includes("gemini-3.1-pro") || modelNameForSystem.includes("gemini-3-pro")) &&
     antigravitySystemInstructionText
   ) {
     // Directly replace the entire systemInstruction with antigravity content

@@ -55,7 +55,11 @@ function mapClaudeModelToGemini(claudeModel) {
     "claude-sonnet-4-6",
     "gemini-3-pro-high",
     "gemini-3-pro-low",
+    "gemini-3.1-pro-high",
+    "gemini-3.1-pro-low",
     "gemini-3-flash",
+    "gemini-3.1-flash-lite",
+    "gemini-3.1-flash-image",
     "gemini-2.5-flash",
     "gemini-2.5-flash-lite",
     "gpt-oss-120b-medium",
@@ -140,7 +144,7 @@ function transformClaudeRequestIn(claudeReq, projectId, options = {}) {
     }
   }
 
-  // Some upstream models (e.g. claude-*, gemini-3-pro*) require an Antigravity-style systemInstruction,
+  // Some upstream models (e.g. claude-*, gemini-3.1-pro*, gemini-3-pro*) require an Antigravity-style systemInstruction,
   // otherwise they may respond with 429 RESOURCE_EXHAUSTED even when quota exists.
   const modelNameForSystem = String(claudeReq?.model || "").toLowerCase();
   if ((modelNameForSystem.includes("claude") || modelNameForSystem.includes("gemini")) && antigravitySystemInstructionText) {
@@ -515,13 +519,21 @@ function transformClaudeRequestIn(claudeReq, projectId, options = {}) {
   const generationConfig = {};
 
   // Thinking - 只要启用 thinking 就必须设置 includeThoughts: true
-  if (claudeReq.thinking && claudeReq.thinking.type === "enabled") {
+  if (claudeReq.thinking && (claudeReq.thinking.type === "enabled" || claudeReq.thinking.type === "adaptive")) {
     generationConfig.thinkingConfig = {
       includeThoughts: true,
     };
-    // 如果提供了 budget_tokens，则设置 thinkingBudget
-    if (claudeReq.thinking.budget_tokens) {
-      let budget = claudeReq.thinking.budget_tokens;
+
+    // - enabled: only set thinkingBudget when client provides budget_tokens
+    // - adaptive: default thinkingBudget=1024 to match fetchAvailableModels() metadata for Claude thinking models
+    let budget = null;
+    if (Number.isFinite(claudeReq.thinking?.budget_tokens) && claudeReq.thinking.budget_tokens > 0) {
+      budget = claudeReq.thinking.budget_tokens;
+    } else if (claudeReq.thinking.type === "adaptive") {
+      budget = 1024;
+    }
+
+    if (Number.isFinite(budget) && budget > 0) {
       // 使用 gemini-2.5-flash 时官方上限 24576，其余模型不强制改动
       const isFlashModel = hasWebSearchTool || (claudeReq.model && claudeReq.model.includes("gemini-2.5-flash"));
       if (isFlashModel) {

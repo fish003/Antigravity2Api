@@ -1,9 +1,8 @@
 const { wrapRequest, unwrapResponse, createUnwrapStream } = require("../transform/gemini");
 
 function isGemini3ModelName(modelName) {
-  return String(modelName || "")
-    .toLowerCase()
-    .includes("gemini-3-pro");
+  const name = String(modelName || "").toLowerCase();
+  return name.includes("gemini-3.1-pro") || name.includes("gemini-3-pro");
 }
 
 function ensureAltSse(queryString) {
