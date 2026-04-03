@@ -181,13 +181,17 @@ function wrapRequest(clientJson, options) {
   if (mappedModelName === "gemini-3-flash-preview") {
     mappedModelName = "gemini-3-flash";
   }
+  // Gemini CLI may send gemini-3.1-pro-preview, but upstream only exposes high/low variants.
+  if (mappedModelName === "gemini-3.1-pro-preview") {
+    mappedModelName = "gemini-3.1-pro-high";
+  }
   if (mappedModelName === "gemini-3-pro-preview" && typeof levelForMapping === "string") {
     const lvl = levelForMapping.toLowerCase();
     if (lvl === "high") mappedModelName = "gemini-3-pro-high";
     else if (lvl === "low") mappedModelName = "gemini-3-pro-low";
   }
 
-  if (mappedModelName === "gemini-3.1-pro" && typeof levelForMapping === "string") {
+  if (mappedModelName === "gemini-3.1-pro-preview" && typeof levelForMapping === "string") {
     const lvl = levelForMapping.toLowerCase();
     if (lvl === "high") mappedModelName = "gemini-3.1-pro-high";
     else if (lvl === "low") mappedModelName = "gemini-3.1-pro-low";
